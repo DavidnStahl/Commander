@@ -8,7 +8,7 @@ namespace MVCRestApiCommands.Data
 {
     public class MockCommanderRepository : ICommanderRepository
     {
-        public IEnumerable<Command> GetAppCommands()
+        public IEnumerable<Command> GetAllCommands()
         {
             var commands = new List<Command>
             {

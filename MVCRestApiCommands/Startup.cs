@@ -31,7 +31,7 @@ namespace MVCRestApiCommands
 
             services.AddControllers();
 
-            services.AddScoped<ICommanderRepository, MockCommanderRepository>();
+            services.AddScoped<ICommanderRepository, SqlCommanderRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -20,7 +20,7 @@ namespace CommanderApp.Controllers
 
         public IActionResult Index()
         {
-
+            var x = 1;
             return View();
         }
 

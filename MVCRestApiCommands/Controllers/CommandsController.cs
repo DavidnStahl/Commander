@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using MVCRestApiCommands.Data;
@@ -52,12 +53,74 @@ namespace MVCRestApiCommands.Controllers
         public ActionResult<CommandReadDto> CreateCommand(CommandCreateDto commandCreateDto)
         {
             var commandModel = _mapper.Map<Command>(commandCreateDto);
+
             _repository.CreateCommand(commandModel);
             _repository.SaveChanges();
 
             var commandReadDto = _mapper.Map<CommandReadDto>(commandModel);
 
             return CreatedAtRoute(nameof(GetCommandById), new {id = commandReadDto.Id }, commandReadDto);
+        }
+
+        //PUT api/command/{id}
+        [HttpPut("{id}")]
+        public ActionResult UpdateCommand(int id, CommandUpdateDto commandUpdateDto)
+        {
+            var commandModelFromRepository = _repository.GetCommandById(id);
+
+            if(commandModelFromRepository is Command)
+            {
+                return NotFound();
+            }
+
+            _mapper.Map(commandUpdateDto, commandModelFromRepository);
+            _repository.UpdateCommand(commandModelFromRepository);
+            _repository.SaveChanges();
+
+            return NoContent();
+        }
+
+        //PATCH api/commands/{id}
+        [HttpPatch("{id}")]
+        public ActionResult PartialCommandUpdate(int id, JsonPatchDocument<CommandUpdateDto> patchDoc)
+        {
+            var commandModelFromRepository = _repository.GetCommandById(id);
+
+            if (commandModelFromRepository == null)
+            {
+                return NotFound();
+            }
+
+            var commandToPatch = _mapper.Map<CommandUpdateDto>(commandModelFromRepository);
+
+            patchDoc.ApplyTo(commandToPatch, ModelState);
+
+            if(!TryValidateModel(commandToPatch))
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            _mapper.Map(commandToPatch, commandModelFromRepository);
+            _repository.UpdateCommand(commandModelFromRepository);
+            _repository.SaveChanges();
+
+            return NoContent();
+        }
+
+        //DELETE api/commands/{id}
+        [HttpDelete("{id}")]
+        public ActionResult DeleteCommand(int id)
+        {
+            var commandModelFromRepository = _repository.GetCommandById(id);
+            if (commandModelFromRepository == null)
+            {
+                return NotFound();
+            }
+
+            _repository.DeleteCommand(commandModelFromRepository);
+            _repository.SaveChanges();
+
+            return NoContent();
         }
     }
 }

@@ -39,7 +39,6 @@ namespace MVCRestApiCommands.Controllers
         public ActionResult <CommandReadDto> GetCommandById(int id)
         {
             var commandItem = _repository.GetCommandById(id);
-
             if(commandItem is Command)
             {
                 return Ok(_mapper.Map<CommandReadDto>(commandItem));
@@ -67,7 +66,6 @@ namespace MVCRestApiCommands.Controllers
         public ActionResult UpdateCommand(int id, CommandUpdateDto commandUpdateDto)
         {
             var commandModelFromRepository = _repository.GetCommandById(id);
-
             if(commandModelFromRepository is Command)
             {
                 return NotFound();
@@ -85,7 +83,6 @@ namespace MVCRestApiCommands.Controllers
         public ActionResult PartialCommandUpdate(int id, JsonPatchDocument<CommandUpdateDto> patchDoc)
         {
             var commandModelFromRepository = _repository.GetCommandById(id);
-
             if (commandModelFromRepository == null)
             {
                 return NotFound();
@@ -94,7 +91,6 @@ namespace MVCRestApiCommands.Controllers
             var commandToPatch = _mapper.Map<CommandUpdateDto>(commandModelFromRepository);
 
             patchDoc.ApplyTo(commandToPatch, ModelState);
-
             if(!TryValidateModel(commandToPatch))
             {
                 return ValidationProblem(ModelState);
